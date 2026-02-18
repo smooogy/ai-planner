@@ -1,3 +1,20 @@
+export interface PreQuoteLineItem {
+  label: string
+  amount: number
+  currency: string
+}
+
+export interface PreQuoteData {
+  venueName: string
+  location?: string
+  dateRange?: string
+  participants?: number
+  totalPrice: number
+  perPerson: number
+  currency: string
+  lineItems: PreQuoteLineItem[]
+}
+
 export interface Proposal {
   id: string | number
   proposalName: string

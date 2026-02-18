@@ -178,7 +178,7 @@ export default function EventWorkspacePage() {
                 className="shrink-0 rounded-full px-2 py-1.5 text-[14px] font-normal capitalize leading-none"
                 style={{ backgroundColor: FIGMA.colors.greyLight, color: FIGMA.colors.grey }}
               >
-                {event?.status ?? "draft"}
+                {"draft"}
               </span>
             )}
           </div>
