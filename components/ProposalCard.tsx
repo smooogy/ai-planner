@@ -9,7 +9,11 @@ import {
   AiMagicIcon,
   Tick02Icon,
   CheckmarkCircle02Icon,
+  Add01Icon,
 } from "@hugeicons/core-free-icons"
+
+const DEFAULT_INSIGHT =
+  "This venue matches your capacity, location and château style preferences."
 
 interface ProposalCardProps {
   proposal: Proposal
@@ -17,11 +21,20 @@ interface ProposalCardProps {
   wishlisted?: boolean
   /** When true, hide the "Brief matching" label and capacity/location tick boxes (e.g. on wishlist). */
   hideBriefMatching?: boolean
+  /** Small text for "Naboo insight" section (only when hideBriefMatching is false). */
+  insight?: string
   onWishlist?: () => void
   onRequestQuote?: () => void
+  /** Called when the card (not a button) is clicked; opens details. */
   onViewDetails?: () => void
-  viewDetailsLabel?: string
   onAskAi?: () => void
+  /** When set, show "Add to compare" / "In compare" and call on toggle (e.g. wishlist). */
+  selectedForCompare?: boolean
+  onToggleCompare?: (e: React.MouseEvent) => void
+  /** When true, footer only shows the compare button (hide Request quote, Ask AI, Save). */
+  footerCompareOnly?: boolean
+  /** When true, hide the "Best fit for your brief" badge (e.g. on wishlist). */
+  hideBestFitBadge?: boolean
 }
 
 const btnBase =
@@ -48,11 +61,15 @@ export function ProposalCard({
   rank,
   wishlisted = false,
   hideBriefMatching = false,
+  insight = DEFAULT_INSIGHT,
   onWishlist,
   onRequestQuote,
   onViewDetails,
-  viewDetailsLabel = "View details",
   onAskAi,
+  selectedForCompare = false,
+  onToggleCompare,
+  footerCompareOnly = false,
+  hideBestFitBadge = false,
 }: ProposalCardProps) {
   const image = typeof proposal.images === "string" ? proposal.images : proposal.images[0]
   const heroImage = image || "/venues/venue1.png"
@@ -60,9 +77,22 @@ export function ProposalCard({
   const currency = proposal.currency || "EUR"
   const estimatedTotal = proposal.estimatedTotal ?? 0
 
+  const handleCardClick = () => {
+    onViewDetails?.()
+  }
+
   return (
     <article
-      className="flex w-full flex-col overflow-hidden bg-white"
+      role="button"
+      tabIndex={0}
+      onClick={handleCardClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault()
+          handleCardClick()
+        }
+      }}
+      className="flex w-full cursor-pointer flex-col overflow-hidden bg-white transition-colors hover:bg-black/[0.02]"
       style={{
         borderRadius: FIGMA.radius.card,
         border: `1px solid ${FIGMA.colors.border}`,
@@ -72,7 +102,25 @@ export function ProposalCard({
       {/* Top row: info + image (prototype-v2 carousel layout) */}
       <div className="flex w-full flex-row items-stretch justify-between gap-4 p-5 min-h-[180px]">
         <div className="flex min-w-0 flex-1 flex-col justify-between">
-          <div>
+          <div className="flex flex-col gap-2">
+            {rank === 1 && !hideBestFitBadge && (
+              <span
+                className="inline-flex w-fit items-center gap-1.5 rounded-full border px-3 py-1 text-[12px] font-medium"
+                style={{
+                  borderColor: FIGMA.colors.border,
+                  backgroundColor: FIGMA.colors.white,
+                  color: FIGMA.colors.black,
+                }}
+              >
+                <HugeiconsIcon
+                  icon={FavouriteIcon}
+                  size={14}
+                  strokeWidth={1.5}
+                  style={{ fill: "#ec4899", color: "#ec4899" }}
+                />
+                Our top pick for your brief
+              </span>
+            )}
             <h3
               className="mb-1 text-[20px] font-medium tracking-[-0.4px]"
               style={{ color: FIGMA.colors.black }}
@@ -81,24 +129,19 @@ export function ProposalCard({
             </h3>
             {proposal.location && (
               <p
-                className="text-[16px] font-normal tracking-[-0.32px]"
+                className="text-[15px] font-normal tracking-[-0.32px]"
                 style={{ color: FIGMA.colors.grey }}
               >
                 {proposal.location}
               </p>
             )}
           </div>
-          <div className="flex flex-col">
-            <span
-              className="text-[24px] font-medium tracking-[-0.48px]"
-              style={{ color: FIGMA.colors.black }}
-            >
-              ~{currency === "EUR" ? "€" : currency}{estimatedTotal.toLocaleString()}
-            </span>
-            <span className="text-[16px] font-normal" style={{ color: FIGMA.colors.grey }}>
-              per person
-            </span>
-          </div>
+          <p className="text-[15px] font-medium leading-tight" style={{ color: FIGMA.colors.black }}>
+            <span style={{ color: FIGMA.colors.grey }}>Estimated: </span>
+            {currency === "EUR" ? "€" : currency}
+            {participants > 0 ? Math.round(estimatedTotal / participants) : estimatedTotal}
+            /person
+          </p>
         </div>
         <div
           className="relative h-[180px] w-[260px] shrink-0 overflow-hidden rounded bg-[#f5f5f5]"
@@ -116,6 +159,27 @@ export function ProposalCard({
           )}
         </div>
       </div>
+
+      {/* Naboo insight (above Brief matching when visible) */}
+      {!hideBriefMatching && (
+        <div
+          className="w-full border-t px-5 py-4"
+          style={{ borderColor: "rgba(0,0,0,0.06)" }}
+        >
+          <p
+            className="mb-1.5 text-[13px] font-normal tracking-[-0.26px]"
+            style={{ color: FIGMA.colors.grey }}
+          >
+            Naboo insight
+          </p>
+          <p
+            className="text-[15px] font-normal leading-snug tracking-[-0.28px]"
+            style={{ color: FIGMA.colors.black }}
+          >
+            {insight}
+          </p>
+        </div>
+      )}
 
       {/* Brief matching */}
       {!hideBriefMatching && (
@@ -173,13 +237,13 @@ export function ProposalCard({
             />
             <div>
               <p
-                className="text-[14px] font-medium tracking-[-0.28px]"
+                className="text-[15px] font-medium tracking-[-0.28px]"
                 style={{ color: FIGMA.colors.black }}
               >
                 {label}:
               </p>
               <p
-                className="text-[14px] font-normal leading-snug tracking-[-0.28px]"
+                className="text-[15px] font-normal leading-snug tracking-[-0.28px]"
                 style={{ color: FIGMA.colors.grey }}
               >
                 {text}
@@ -193,43 +257,70 @@ export function ProposalCard({
       <div
         className="flex flex-wrap items-center justify-between gap-2 border-t px-5 py-3"
         style={{ borderColor: "rgba(0,0,0,0.06)" }}
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="flex flex-wrap gap-2">
-          <button type="button" className={btnPrimary} onClick={onRequestQuote}>
-            Request a quote
-          </button>
-          <button type="button" className={btnOutline} onClick={onViewDetails}>
-            {viewDetailsLabel}
-          </button>
-          <button type="button" className={btnOutline} onClick={onAskAi}>
-            <HugeiconsIcon
-              icon={AiMagicIcon}
-              size={18}
-              color={FIGMA.colors.black}
-              strokeWidth={1.5}
-            />
-            Ask AI
-          </button>
+          {!footerCompareOnly && (
+            <>
+              <button type="button" className={btnPrimary} onClick={onRequestQuote}>
+                Request a quote
+              </button>
+              <button type="button" className={btnOutline} onClick={onAskAi}>
+                <HugeiconsIcon
+                  icon={AiMagicIcon}
+                  size={18}
+                  color={FIGMA.colors.black}
+                  strokeWidth={1.5}
+                />
+                Ask AI
+              </button>
+            </>
+          )}
+          {onToggleCompare && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                onToggleCompare(e)
+              }}
+              className={cn(
+                "h-10 px-4 rounded-[4px] font-sans font-medium text-[15px] leading-[1] tracking-[-0.08px] flex items-center justify-center gap-1.5 transition-colors whitespace-nowrap",
+                selectedForCompare
+                  ? "bg-black/8 text-black border border-black"
+                  : "border border-black/12 bg-white text-black hover:bg-black/[0.04]",
+              )}
+            >
+              <HugeiconsIcon
+                icon={selectedForCompare ? Tick02Icon : Add01Icon}
+                size={18}
+                color={FIGMA.colors.black}
+                strokeWidth={1.5}
+              />
+              {selectedForCompare ? "Selected" : "Add to compare"}
+            </button>
+          )}
         </div>
-        <button
-          type="button"
-          onClick={onWishlist}
-          className="flex h-10 items-center gap-1.5 rounded border bg-white px-4 text-[16px] font-medium transition-colors hover:bg-black/5 disabled:opacity-50"
-          style={{
-            borderColor: FIGMA.colors.border,
-            color: FIGMA.colors.black,
-            borderRadius: FIGMA.radius.button,
-          }}
-        >
-          <HugeiconsIcon
-            icon={FavouriteIcon}
-            size={16}
-            strokeWidth={1.5}
-            style={wishlisted ? { fill: "currentColor" } : undefined}
-            color={FIGMA.colors.grey}
-          />
-          {!wishlisted && "Save"}
-        </button>
+        {!footerCompareOnly && (
+          <button
+            type="button"
+            onClick={onWishlist}
+            className="flex h-10 items-center gap-1.5 rounded border bg-white px-4 text-[16px] font-medium transition-colors hover:bg-black/5 disabled:opacity-50"
+            style={{
+              borderColor: FIGMA.colors.border,
+              color: FIGMA.colors.black,
+              borderRadius: FIGMA.radius.button,
+            }}
+          >
+            <HugeiconsIcon
+              icon={FavouriteIcon}
+              size={16}
+              strokeWidth={1.5}
+              style={wishlisted ? { fill: "currentColor" } : undefined}
+              color={FIGMA.colors.grey}
+            />
+            {!wishlisted && "Save"}
+          </button>
+        )}
       </div>
     </article>
   )

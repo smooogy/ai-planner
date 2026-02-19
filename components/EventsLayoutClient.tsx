@@ -1,6 +1,7 @@
 "use client"
 
 import { usePathname } from "next/navigation"
+import { CompareUxOptionProvider } from "@/context/CompareUxOptionContext"
 import { EventsSidebar } from "./EventsSidebar"
 
 export function EventsLayoutClient({ children }: { children: React.ReactNode }) {
@@ -16,11 +17,13 @@ export function EventsLayoutClient({ children }: { children: React.ReactNode }) 
   }
 
   return (
-    <div className="flex h-screen w-full overflow-hidden">
-      <EventsSidebar />
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-white">
-        {children}
+    <CompareUxOptionProvider>
+      <div className="flex h-screen w-full overflow-hidden">
+        <EventsSidebar />
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-white">
+          {children}
+        </div>
       </div>
-    </div>
+    </CompareUxOptionProvider>
   )
 }

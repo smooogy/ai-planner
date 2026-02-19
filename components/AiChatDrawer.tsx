@@ -9,6 +9,7 @@ import { Cancel01Icon } from "@hugeicons/core-free-icons"
 export type AiChatContext =
   | { type: "proposal"; venueName: string }
   | { type: "quote"; quoteNumber: number; venueName?: string }
+  | { type: "compare"; venueNames: string[] }
 
 const PROPOSAL_SUGGESTIONS = [
   "What's included?",
@@ -22,6 +23,12 @@ const QUOTE_SUGGESTIONS = [
   "Can you break down the pricing?",
   "What are the availability options?",
 ]
+const COMPARE_SUGGESTIONS = [
+  "Summarize pros and cons for my event.",
+  "Which one fits best for a team retreat?",
+  "Break down pricing differences.",
+  "Compare availability and capacity.",
+]
 
 export interface AiChatDrawerProps {
   context: AiChatContext
@@ -34,9 +41,16 @@ export function AiChatDrawer({ context, onClose }: AiChatDrawerProps) {
   const title =
     context.type === "proposal"
       ? `Chat about ${context.venueName}`
-      : `Quote #${context.quoteNumber} changes`
+      : context.type === "quote"
+        ? `Quote #${context.quoteNumber} changes`
+        : `Compare: ${context.venueNames.join(", ")}`
 
-  const suggestions = context.type === "proposal" ? PROPOSAL_SUGGESTIONS : QUOTE_SUGGESTIONS
+  const suggestions =
+    context.type === "proposal"
+      ? PROPOSAL_SUGGESTIONS
+      : context.type === "quote"
+        ? QUOTE_SUGGESTIONS
+        : COMPARE_SUGGESTIONS
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -90,7 +104,13 @@ export function AiChatDrawer({ context, onClose }: AiChatDrawerProps) {
       <div className="shrink-0 pt-4 px-4">
         <ChatInput
           variant="small"
-          placeholder={context.type === "proposal" ? "Ask about this venue..." : "Ask about this quote..."}
+          placeholder={
+            context.type === "proposal"
+              ? "Ask about this venue..."
+              : context.type === "quote"
+                ? "Ask about this quote..."
+                : "Ask for a comparison..."
+          }
           value={inputValue}
           onInputChange={setInputValue}
           onSubmit={handleSubmit}

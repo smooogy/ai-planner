@@ -17,7 +17,7 @@ export interface InsetDrawerProps {
   hideCloseButton?: boolean
 }
 
-const TRANSITION_MS = 250
+const TRANSITION_MS = 320
 
 export function InsetDrawer({ open, onClose, children, maxWidth = 680, borderRadius = 12, hideCloseButton = false }: InsetDrawerProps) {
   const [entered, setEntered] = useState(false)
@@ -60,14 +60,15 @@ export function InsetDrawer({ open, onClose, children, maxWidth = 680, borderRad
         }}
         onClick={handleClose}
       />
-      {/* Panel: right-aligned, slide from right */}
+      {/* Panel: right-aligned, slide from right with fade */}
       <div
         className="relative flex max-h-[calc(100vh-24px)] w-full flex-col overflow-hidden bg-white shadow-xl ease-out"
         style={{
           maxWidth: typeof maxWidth === "number" ? `${maxWidth}px` : maxWidth,
           borderRadius,
           transform: entered && !exiting ? "translateX(0)" : "translateX(100%)",
-          transition: `transform ${TRANSITION_MS}ms ease-out`,
+          opacity: entered && !exiting ? 1 : 0,
+          transition: `transform ${TRANSITION_MS}ms cubic-bezier(0.32, 0.72, 0, 1), opacity ${TRANSITION_MS}ms ease-out`,
         }}
         role="dialog"
         aria-modal="true"

@@ -77,3 +77,37 @@ body {
 .animate-typewriter-word {
   animation: typewriter-word 0.22s ease-out forwards;
 }
+
+@keyframes pill-appear {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-pill-appear {
+  animation: pill-appear 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes circle-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.35);
+  }
+  70% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-circle-pop {
+  animation: circle-pop 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}

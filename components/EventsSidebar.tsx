@@ -6,6 +6,7 @@ import { FIGMA } from "@/data/constants"
 import { cn } from "@/lib/cn"
 import { MOCK_EVENTS } from "@/data/events"
 import type { EventDraft } from "@/data/events"
+import { useCompareUxOption, COMPARE_UX_LABELS, type CompareUxOption } from "@/context/CompareUxOptionContext"
 import { HugeiconsIcon } from "@hugeicons/react"
 import {
   Add01Icon,
@@ -22,6 +23,7 @@ const DEFAULT_EVENT_NAME = "Untitled event"
 
 export function EventsSidebar() {
   const pathname = usePathname()
+  const { option: compareUxOption, setOption: setCompareUxOption } = useCompareUxOption()
   const recents = MOCK_EVENTS.slice(0, RECENTS_MAX)
   const activeEventId =
     pathname?.startsWith("/events/") && pathname !== "/events" && pathname !== "/events/new" && pathname !== "/events/archived" && pathname !== "/events/wishlist" && pathname !== "/events/overview"
@@ -118,7 +120,25 @@ export function EventsSidebar() {
           )}
         </div>
 
-        <div className="mt-auto shrink-0 pt-1.5">
+        <div className="mt-auto shrink-0 space-y-2 pt-1.5">
+          <div className="px-3">
+            <label htmlFor="compare-ux" className="mb-1 block text-[11px] font-medium uppercase tracking-wider" style={{ color: FIGMA.colors.grey }}>
+              Compare UX
+            </label>
+            <select
+              id="compare-ux"
+              value={compareUxOption}
+              onChange={(e) => setCompareUxOption(e.target.value as CompareUxOption)}
+              className="w-full rounded-[4px] border bg-white px-2.5 py-1.5 text-[13px] font-normal"
+              style={{ borderColor: FIGMA.colors.border, color: FIGMA.colors.black }}
+            >
+              {(Object.entries(COMPARE_UX_LABELS) as [CompareUxOption, string][]).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </div>
           <Link
             href="/events/archived"
             className="flex items-center gap-3 rounded-md px-3 py-1.5 text-[13px] font-normal transition-colors hover:bg-black/[0.06]"

@@ -124,9 +124,7 @@ export function ProposalCarousel({ children, className = "", artifactHeader }: P
           <div
             key={index}
             className={cn(
-              "flex-shrink-0 snap-start",
-              "w-[calc(100%-40px)] min-w-[calc(100%-40px)]",
-              "lg:w-[calc(100%-70px)] lg:min-w-[calc(100%-70px)]",
+              "flex-shrink-0 snap-start w-full min-w-full",
               "first:ml-0 last:mr-0",
             )}
           >
