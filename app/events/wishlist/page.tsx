@@ -160,7 +160,7 @@ export default function WishlistPage() {
               <p className="text-[14px] font-normal tracking-[-0.08px]" style={{ color: FIGMA.colors.grey }}>Tap the heart icon on any venue to add it to your wishlist.</p>
             </div>
           ) : viewMode === "list" ? (
-            <ul className="grid grid-cols-1 gap-4">
+            <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {wishlistProposals.map((p, i) => (
                   <li key={p.id}>
                     <ProposalCard
