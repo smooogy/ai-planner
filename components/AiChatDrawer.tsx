@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { FIGMA } from "@/data/constants"
 import { ChatInput } from "@/components/ChatInput"
 import { HugeiconsIcon } from "@hugeicons/react"
@@ -9,7 +9,7 @@ import { Cancel01Icon } from "@hugeicons/core-free-icons"
 export type AiChatContext =
   | { type: "proposal"; venueName: string }
   | { type: "quote"; quoteNumber: number; venueName?: string }
-  | { type: "compare"; venueNames: string[] }
+  | { type: "compare"; venueNames: string[]; initialQuestion?: string }
 
 const PROPOSAL_SUGGESTIONS = [
   "What's included?",
@@ -36,7 +36,15 @@ export interface AiChatDrawerProps {
 }
 
 export function AiChatDrawer({ context, onClose }: AiChatDrawerProps) {
-  const [inputValue, setInputValue] = useState("")
+  const [inputValue, setInputValue] = useState(
+    context.type === "compare" && context.initialQuestion ? context.initialQuestion : ""
+  )
+
+  useEffect(() => {
+    if (context.type === "compare" && context.initialQuestion) {
+      setInputValue(context.initialQuestion)
+    }
+  }, [context.type, context.type === "compare" ? context.initialQuestion : null])
 
   const title =
     context.type === "proposal"

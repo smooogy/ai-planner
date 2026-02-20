@@ -4,7 +4,8 @@ import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
 import { FIGMA } from "@/data/constants"
-import { MOCK_EVENTS, MOCK_QUOTES, MOCK_QUOTE_ITEMS, MOCK_QUOTE_DETAILS, MOCK_STATUS } from "@/data/events"
+import { MOCK_EVENTS, MOCK_QUOTES, MOCK_STATUS } from "@/data/events"
+import { MOCK_QUOTES_EXTENDED, MOCK_QUOTE_DETAILS_EXTENDED } from "@/data/quotes"
 import { MOCK_PROPOSALS, AI_MESSAGE } from "@/data/proposals"
 import type { Proposal } from "@/data/proposals"
 import { PROTOTYPE_ADVISOR } from "@/data/advisor"
@@ -18,8 +19,10 @@ import { VenueDetailDrawer } from "@/components/VenueDetailDrawer"
 import { AiChatDrawer } from "@/components/AiChatDrawer"
 import type { AiChatContext } from "@/components/AiChatDrawer"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { Chat01Icon, BookmarkIcon, Home01Icon, AiMagicIcon, Clock01Icon } from "@hugeicons/core-free-icons"
+import { Chat01Icon, BookmarkIcon, Home01Icon, AiMagicIcon, LayoutThreeColumnIcon } from "@hugeicons/core-free-icons"
 import { ClipboardIcon } from "@hugeicons/core-free-icons"
+import { StatusPill } from "@/components/CompareQuotePicker"
+import { CompareQuotesView } from "@/components/CompareQuotesView"
 import { ChatArtifactCard } from "@/components/ChatArtifactCard"
 
 const DEFAULT_EVENT_NAME = "Untitled event"
@@ -46,7 +49,15 @@ export default function EventWorkspacePage() {
   const [selectedQuoteId, setSelectedQuoteId] = useState<string | null>(null)
   const [selectedProposalForDetails, setSelectedProposalForDetails] = useState<Proposal | null>(null)
   const [aiChatContext, setAiChatContext] = useState<AiChatContext | null>(null)
+  const [compareFlowOpen, setCompareFlowOpen] = useState(false)
+  const [compareSelectedIds, setCompareSelectedIds] = useState<string[]>([])
   const chatScrollRef = useRef<HTMLDivElement>(null)
+
+  const openCompareAll = () => {
+    setCompareSelectedIds(MOCK_QUOTES_EXTENDED.map((q) => q.id))
+    setCompareFlowOpen(true)
+  }
+  const compareViewQuotes = MOCK_QUOTES_EXTENDED.filter((q) => compareSelectedIds.includes(q.id))
   const [typedAiMessage, setTypedAiMessage] = useState("")
   const [typedWords, setTypedWords] = useState<string[]>([])
   const [showAiSuggestions, setShowAiSuggestions] = useState(false)
@@ -162,7 +173,7 @@ export default function EventWorkspacePage() {
   }
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden font-sans antialiased bg-white">
+    <div className="relative flex h-full w-full flex-col overflow-hidden font-sans antialiased bg-white">
       <header className="fixed top-0 left-[275px] right-0 z-30 flex h-14 items-center gap-4 px-4 sm:px-6 bg-white border-b" style={{ borderColor: FIGMA.colors.border }}>
         <nav className="flex min-w-0 flex-1 items-center gap-2 text-[14px] font-normal tracking-[-0.08px]" aria-label="Breadcrumb">
           <Link href="/events" className="flex shrink-0 items-center rounded p-1.5 transition-colors hover:bg-black/5" style={{ color: FIGMA.colors.black }} aria-label="My events">
@@ -342,37 +353,54 @@ export default function EventWorkspacePage() {
                     No quotes yet. Request a quote from a venue in the Chat tab to see it here.
                   </p>
                 ) : (
+                <>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <p className="text-[14px] tracking-[-0.08px]" style={{ color: FIGMA.colors.grey }}>
+                    {MOCK_QUOTES_EXTENDED.length} quotes
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => openCompareAll()}
+                    className="flex h-11 items-center gap-2 rounded px-2.5 font-sans text-[15px] font-medium transition-colors hover:bg-black/[0.04]"
+                    style={{
+                      color: FIGMA.colors.black,
+                      backgroundColor: FIGMA.colors.white,
+                      boxShadow: "0 1px 2px rgba(0,0,0,0.06)",
+                      border: `1px solid ${FIGMA.colors.border}`,
+                    }}
+                  >
+                    <HugeiconsIcon icon={LayoutThreeColumnIcon} size={18} color={FIGMA.colors.black} strokeWidth={1.5} />
+                    <span>Compare quotes ({MOCK_QUOTES_EXTENDED.length})</span>
+                  </button>
+                </div>
                 <ul className="flex flex-col gap-4">
-                  {MOCK_QUOTE_ITEMS.map((quote, quoteIndex) => (
+                  {MOCK_QUOTES_EXTENDED.map((quote, quoteIndex) => (
                     <li
                       key={quote.id}
-                      className="flex gap-4 rounded-lg border p-4 cursor-pointer transition-colors hover:bg-black/[0.02]"
+                      className="flex gap-4 rounded-lg border p-4 transition-colors hover:bg-black/[0.02]"
                       style={{ borderColor: FIGMA.colors.border, backgroundColor: FIGMA.colors.white }}
-                      onClick={() => setSelectedQuoteId(quote.id)}
-                      onKeyDown={(e) => e.key === "Enter" && setSelectedQuoteId(quote.id)}
-                      role="button"
-                      tabIndex={0}
                     >
                       <div className="flex min-w-0 flex-1 flex-col gap-2">
-                        <span
-                          className="inline-flex w-fit items-center gap-1.5 rounded border px-2.5 py-1 text-[13px] font-normal tracking-[-0.08px]"
-                          style={{
-                            backgroundColor: FIGMA.colors.white,
-                            borderColor: FIGMA.colors.border,
-                            color: FIGMA.colors.black,
-                          }}
-                        >
-                          {quote.status === "Availability to be confirmed" && (
-                            <HugeiconsIcon icon={Clock01Icon} size={14} color={FIGMA.colors.black} strokeWidth={1.5} />
-                          )}
-                          {quote.status}
-                        </span>
+                        <StatusPill status={quote.status} />
                         <p className="text-[18px] font-medium tracking-[-0.08px]" style={{ color: FIGMA.colors.black }}>
                           {quote.venueName}
                         </p>
                         <p className="text-[14px] tracking-[-0.08px]" style={{ color: FIGMA.colors.grey }}>
                           {quote.dateRange} · {quote.attendees} attendees · {quote.location}
                         </p>
+                        {quote.aiInsights && quote.aiInsights.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5">
+                            {quote.aiInsights.slice(0, 2).map((insight) => (
+                              <span
+                                key={insight}
+                                className="rounded px-2 py-0.5 text-[12px] font-normal"
+                                style={{ backgroundColor: FIGMA.colors.greyLight, color: FIGMA.colors.grey }}
+                              >
+                                {insight}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                         <div className="mt-2 flex flex-wrap items-baseline gap-2">
                           <span className="text-[14px] tracking-[-0.08px]" style={{ color: FIGMA.colors.grey }}>
                             From
@@ -381,40 +409,26 @@ export default function EventWorkspacePage() {
                             {quote.totalPrice} {quote.currency} excl. tax
                           </span>
                           <span className="text-[14px] tracking-[-0.08px]" style={{ color: FIGMA.colors.grey }}>
-                            {quote.perPerson} {quote.currency} excl. tax/person
+                            {quote.perPerson} {quote.currency}/person
                           </span>
                         </div>
                         <div className="mt-3 flex flex-wrap gap-2">
                           <button
                             type="button"
-                            className="rounded-[4px] px-4 py-2 text-[14px] font-medium tracking-[-0.08px] transition-colors hover:opacity-90"
-                            style={{ backgroundColor: FIGMA.colors.green, color: FIGMA.colors.black }}
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            Request final quote
-                          </button>
-                          <button
-                            type="button"
                             className="rounded-[4px] border px-4 py-2 text-[14px] font-medium tracking-[-0.08px] transition-colors hover:bg-black/[0.04]"
                             style={{ borderColor: FIGMA.colors.border, color: FIGMA.colors.black }}
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setSelectedQuoteId(quote.id)
-                            }}
+                            onClick={() => setSelectedQuoteId(quote.id)}
                           >
-                            See AI pre-quote
+                            View AI pre-quote
                           </button>
                           <button
                             type="button"
                             className="flex items-center gap-1.5 rounded-[4px] border px-4 py-2 text-[14px] font-medium tracking-[-0.08px] transition-colors hover:bg-black/[0.04]"
                             style={{ borderColor: FIGMA.colors.border, color: FIGMA.colors.black }}
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setAiChatContext({ type: "quote", quoteNumber: quoteIndex + 1, venueName: quote.venueName })
-                            }}
+                            onClick={() => openCompareAll()}
                           >
-                            <HugeiconsIcon icon={AiMagicIcon} size={18} color={FIGMA.colors.black} strokeWidth={1.5} />
-                            Ask AI
+                            <HugeiconsIcon icon={LayoutThreeColumnIcon} size={18} color={FIGMA.colors.black} strokeWidth={1.5} />
+                            Compare
                           </button>
                         </div>
                       </div>
@@ -426,6 +440,7 @@ export default function EventWorkspacePage() {
                     </li>
                   ))}
                 </ul>
+                </>
                 )}
               </div>
             )}
@@ -439,10 +454,10 @@ export default function EventWorkspacePage() {
         </div>
       </div>
 
-      {selectedQuoteId && MOCK_QUOTE_DETAILS[selectedQuoteId] && (
+      {selectedQuoteId && MOCK_QUOTE_DETAILS_EXTENDED[selectedQuoteId] && (
         <InsetDrawer open onClose={() => setSelectedQuoteId(null)} maxWidth={680} hideCloseButton>
           <QuoteDetailDrawer
-            detail={MOCK_QUOTE_DETAILS[selectedQuoteId]}
+            detail={MOCK_QUOTE_DETAILS_EXTENDED[selectedQuoteId]}
             onRequestFinalQuote={() => setSelectedQuoteId(null)}
             onClose={() => setSelectedQuoteId(null)}
           />
@@ -467,6 +482,40 @@ export default function EventWorkspacePage() {
           <AiChatDrawer context={aiChatContext} onClose={() => setAiChatContext(null)} />
         </InsetDrawer>
       )}
+
+      <InsetDrawer
+        open={compareFlowOpen}
+        onClose={() => setCompareFlowOpen(false)}
+        maxWidth={900}
+        hideCloseButton
+      >
+        <CompareQuotesView
+          quotes={compareViewQuotes}
+          details={MOCK_QUOTE_DETAILS_EXTENDED}
+          onClose={() => setCompareFlowOpen(false)}
+          onAskAi={(initialQuestion) => {
+            setCompareFlowOpen(false)
+            setAiChatContext({
+              type: "compare",
+              venueNames: compareViewQuotes.map((q) => q.venueName),
+              initialQuestion,
+            })
+          }}
+          onViewQuote={(id) => {
+            setCompareFlowOpen(false)
+            setSelectedQuoteId(id)
+          }}
+          onRemoveQuote={(id) => {
+            const next = compareSelectedIds.filter((x) => x !== id)
+            if (next.length >= 2) {
+              setCompareSelectedIds(next)
+            }
+          }}
+          onRequestFinalQuote={(id) => {
+            setCompareFlowOpen(false)
+          }}
+        />
+      </InsetDrawer>
     </div>
   )
 }

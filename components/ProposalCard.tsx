@@ -47,12 +47,12 @@ const btnOutline = cn(
 
 const WHY_THIS_VENUE_ITEMS: { label: string; text: string }[] = [
   {
-    label: "Countryside environment",
-    text: "in Île-de-France near Versailles, you get a calmer retreat setting.",
+    label: "Castle-style venue",
+    text: "17th-century estate classified as a historical monument, creating a château setting.",
   },
   {
-    label: "Castle-style venue",
-    text: "near the Palace of Versailles, you tap into a strong historic-château atmosphere.",
+    label: "Countryside environment",
+    text: "vast Le Nôtre-designed gardens enable outdoor activities like badminton and biking.",
   },
 ]
 
@@ -92,7 +92,7 @@ export function ProposalCard({
           handleCardClick()
         }
       }}
-      className="flex w-full cursor-pointer flex-col overflow-hidden bg-white transition-colors hover:bg-black/[0.02]"
+      className="flex w-full cursor-pointer flex-col overflow-hidden bg-white transition-[border-color,box-shadow] hover:border-black/20 hover:shadow-md"
       style={{
         borderRadius: FIGMA.radius.card,
         border: `1px solid ${FIGMA.colors.border}`,
@@ -100,7 +100,7 @@ export function ProposalCard({
       }}
     >
       {/* Top row: info + image (prototype-v2 carousel layout) */}
-      <div className="flex w-full flex-row items-stretch justify-between gap-4 p-5 min-h-[180px]">
+      <div className="flex w-full flex-row items-stretch justify-between gap-4 p-5 min-h-[150px]">
         <div className="flex min-w-0 flex-1 flex-col justify-between">
           <div className="flex flex-col gap-2">
             {rank === 1 && !hideBestFitBadge && (
@@ -121,20 +121,22 @@ export function ProposalCard({
                 Our top pick for your brief
               </span>
             )}
-            <h3
-              className="mb-1 text-[20px] font-medium tracking-[-0.4px]"
-              style={{ color: FIGMA.colors.black }}
-            >
-              {proposal.proposalName}
-            </h3>
-            {proposal.location && (
-              <p
-                className="text-[15px] font-normal tracking-[-0.32px]"
-                style={{ color: FIGMA.colors.grey }}
+            <div>
+              <h3
+                className="mb-1 text-[20px] font-medium tracking-[-0.4px]"
+                style={{ color: FIGMA.colors.black }}
               >
-                {proposal.location}
-              </p>
-            )}
+                {proposal.proposalName}
+              </h3>
+              {proposal.location && (
+                <p
+                  className="text-[15px] font-normal tracking-[-0.32px]"
+                  style={{ color: FIGMA.colors.grey }}
+                >
+                  {proposal.location}
+                </p>
+              )}
+            </div>
           </div>
           <p className="text-[15px] font-medium leading-tight" style={{ color: FIGMA.colors.black }}>
             <span style={{ color: FIGMA.colors.grey }}>Estimated: </span>
@@ -144,7 +146,7 @@ export function ProposalCard({
           </p>
         </div>
         <div
-          className="relative h-[180px] w-[260px] shrink-0 overflow-hidden rounded bg-[#f5f5f5]"
+          className="relative h-[150px] w-[230px] shrink-0 overflow-hidden rounded bg-[#f5f5f5]"
           style={{ borderRadius: 4 }}
         >
           <img
@@ -162,10 +164,7 @@ export function ProposalCard({
 
       {/* Naboo insight (above Brief matching when visible) */}
       {!hideBriefMatching && (
-        <div
-          className="w-full border-t px-5 py-4"
-          style={{ borderColor: "rgba(0,0,0,0.06)" }}
-        >
+        <div className="mx-4 rounded-[4px] px-5 py-4 bg-neutral-100">
           <p
             className="mb-1.5 text-[13px] font-normal tracking-[-0.26px]"
             style={{ color: FIGMA.colors.grey }}
@@ -183,10 +182,7 @@ export function ProposalCard({
 
       {/* Brief matching */}
       {!hideBriefMatching && (
-        <div
-          className="w-full border-t px-5 py-4"
-          style={{ borderColor: "rgba(0,0,0,0.06)" }}
-        >
+        <div className="w-full px-5 py-4">
           <p
             className="mb-2 text-[13px] font-normal tracking-[-0.26px]"
             style={{ color: FIGMA.colors.grey }}
@@ -240,7 +236,7 @@ export function ProposalCard({
                 className="text-[15px] font-medium tracking-[-0.28px]"
                 style={{ color: FIGMA.colors.black }}
               >
-                {label}:
+                {label}
               </p>
               <p
                 className="text-[15px] font-normal leading-snug tracking-[-0.28px]"

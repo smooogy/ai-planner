@@ -50,7 +50,7 @@ export default function LandingPage() {
     (e: React.FormEvent) => {
       e.preventDefault()
       if (inputValue.trim()) {
-        router.push("/events/e1")
+        router.push("/search")
       }
     },
     [inputValue, router],

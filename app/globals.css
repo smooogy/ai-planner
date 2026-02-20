@@ -59,6 +59,43 @@ body {
   animation: text-shimmer 2.4s ease-in-out infinite;
 }
 
+/* Cursor-style gradient sweep shimmer for quote progress (light band moving back and forth, subtle) */
+@keyframes shimmer-sweep {
+  0%, 100% { background-position: 200% 0; }
+  50% { background-position: -200% 0; }
+}
+
+.animate-text-shimmer-quote {
+  background: linear-gradient(
+    90deg,
+    var(--shimmer-base, #212724) 0%,
+    var(--shimmer-base, #212724) 40%,
+    rgba(255, 255, 255, 0.12) 50%,
+    var(--shimmer-base, #212724) 60%,
+    var(--shimmer-base, #212724) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer-sweep 4s ease-in-out infinite;
+}
+
+/* Spinner "par accoup": stepped motion (small steps left, then big sweep back), not smooth */
+@keyframes spin-par-accoup {
+  0% { transform: rotate(0deg); }
+  15% { transform: rotate(-25deg); }
+  30% { transform: rotate(-50deg); }
+  45% { transform: rotate(-75deg); }
+  55% { transform: rotate(-100deg); }
+  65% { transform: rotate(0deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.animate-spin-accoup {
+  animation: spin-par-accoup 2.5s steps(6, end) infinite;
+}
+
 @keyframes border-slide {
   0%, 100% { background-position: 0% 0; }
   50% { background-position: 100% 0; }
@@ -110,4 +147,32 @@ body {
 
 .animate-circle-pop {
   animation: circle-pop 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes loading-stage {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-loading-stage {
+  animation: loading-stage 0.3s ease-out forwards;
+}
+
+@keyframes workspace-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-workspace-enter {
+  animation: workspace-enter 0.3s ease-out forwards;
 }
