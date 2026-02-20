@@ -468,7 +468,7 @@ export default function SearchPage() {
                   )
                 })}
                 {quoteRequestChatItems.length > 0 && (
-                  <div aria-hidden style={{ minHeight: "40vh" }} />
+                  <div aria-hidden style={{ minHeight: "70vh" }} />
                 )}
               </>
             )}
